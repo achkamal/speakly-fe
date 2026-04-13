@@ -1,0 +1,91 @@
+.sidebar-right-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sidebar-right-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-md {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.trending-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trending-item {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.suggested-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.suggested-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.suggested-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.suggested-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.suggested-username {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Sidebar divider line */
+.sidebar-right-section:not(:last-child)::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background-color: var(--border-color);
+  margin-top: 32px;
+}

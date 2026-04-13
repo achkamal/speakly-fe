@@ -1,0 +1,107 @@
+.post-card {
+  padding: 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin: 0 20px 16px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-card);
+}
+
+.post-card:hover {
+  transform: translateY(-1px);
+}
+
+.post-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.post-header-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-username {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.post-time {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.post-options-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.post-options-btn:hover {
+  background-color: var(--bg-secondary);
+}
+
+.post-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  margin-bottom: 16px;
+}
+
+.post-image {
+  margin-top: 12px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary); /* A placeholder color */
+  width: min-content; /* Make image container take content size if image is small */
+}
+
+/* Let the image define its size up to full width */
+.post-image img {
+  max-width: 100%;
+  max-height: 400px; /* Optional cap */
+  display: block;
+}
+
+.post-actions {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.action-btn:hover {
+  color: var(--text-primary);
+}
+
+.action-btn-share {
+  margin-left: auto; /* Push Share to the right */
+}

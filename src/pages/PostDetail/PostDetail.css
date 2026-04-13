@@ -1,0 +1,165 @@
+.post-detail-container {
+  padding: 24px 0 40px;
+}
+
+.detail-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding: 0 20px;
+  color: var(--text-primary);
+}
+
+.thread-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin: 0 20px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.thread-list {
+  padding: 20px;
+}
+
+.comment-block {
+  margin-bottom: 24px;
+}
+
+.comment-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.comment-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-username {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.comment-action-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.comment-header .post-options-btn {
+  margin-left: auto;
+}
+
+.comment-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* Threading lines magic */
+.replies-container {
+  padding-left: 18px; /* half of avatar (18) */
+  margin-left: 0;
+  border-left: 2px solid var(--border-color); /* The vertical line */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 4px;
+  padding-bottom: 8px;
+}
+
+.reply-item {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  /* Push to the right so avatar overlaps the space */
+  padding-left: 14px; 
+}
+
+.thread-horizontal-line {
+  position: absolute;
+  left: 0;
+  top: 18px; /* middle of 36px avatar */
+  width: 14px;
+  height: 2px;
+  background-color: var(--border-color);
+}
+
+.comment-input-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-card); /* Keep it card color */
+}
+
+.comment-input-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  padding-left: 16px;
+}
+
+.comment-text-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.comment-text-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.submit-reply-btn {
+  background-color: #111; /* Solid black like Apple's dark buttons */
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 13px;
+  transition: opacity 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-reply-btn:hover {
+  opacity: 0.8;
+}
+
+/* In dark mode we might need the input box adjusting */
+@media (prefers-color-scheme: dark) {
+  .submit-reply-btn {
+    background-color: #e5e5e5;
+    color: #111;
+  }
+}
