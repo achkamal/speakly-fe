@@ -1,38 +1,158 @@
 .post-detail-container {
-  padding: 24px 0 40px;
+  padding: 0 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.detail-section-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  padding: 0 20px;
+/* Back button */
+.detail-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 16px 20px 8px;
+  transition: color 0.2s;
+}
+
+.detail-back-btn:hover {
   color: var(--text-primary);
 }
 
+/* Loading / empty states */
+.detail-loading,
+.detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--bg-secondary);
+}
+
+/* Thread card */
 .thread-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  margin: 0 20px;
+  margin: 12px 20px 0;
   box-shadow: var(--shadow-card);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.thread-list {
-  padding: 20px;
+.thread-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
+.thread-list {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.thread-list::-webkit-scrollbar {
+  width: 4px;
+}
+.thread-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thread-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+/* Comment loading/empty */
+.comments-loading,
+.no-comments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Individual comment */
 .comment-block {
-  margin-bottom: 24px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+  animation: fadeSlideIn 0.25s ease;
+}
+
+.comment-block:last-child {
+  border-bottom: none;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .comment-item {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .comment-avatar {
@@ -41,80 +161,53 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  position: relative;
-  z-index: 2;
 }
 
 .comment-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .comment-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.comment-username {
+.comment-name {
   font-weight: 600;
   font-size: 14px;
   color: var(--text-primary);
 }
 
-.comment-action-text {
-  font-size: 14px;
+.comment-username {
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
-.comment-header .post-options-btn {
+.comment-time {
+  font-size: 12px;
+  color: var(--text-secondary);
   margin-left: auto;
 }
 
 .comment-text {
   font-size: 14px;
   color: var(--text-primary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-/* Threading lines magic */
-.replies-container {
-  padding-left: 18px; /* half of avatar (18) */
-  margin-left: 0;
-  border-left: 2px solid var(--border-color); /* The vertical line */
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-top: 4px;
-  padding-bottom: 8px;
-}
-
-.reply-item {
-  display: flex;
-  gap: 12px;
-  position: relative;
-  /* Push to the right so avatar overlaps the space */
-  padding-left: 14px; 
-}
-
-.thread-horizontal-line {
-  position: absolute;
-  left: 0;
-  top: 18px; /* middle of 36px avatar */
-  width: 14px;
-  height: 2px;
-  background-color: var(--border-color);
-}
-
+/* Comment input area */
 .comment-input-area {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-top: 1px solid var(--border-color);
-  background-color: var(--bg-card); /* Keep it card color */
+  background-color: var(--bg-card);
 }
 
 .comment-input-box {
@@ -123,8 +216,13 @@
   align-items: center;
   background-color: var(--bg-secondary);
   border-radius: var(--radius-full);
-  padding: 4px;
-  padding-left: 16px;
+  padding: 4px 4px 4px 16px;
+  border: 1px solid var(--border-color);
+  transition: border-color 0.2s;
+}
+
+.comment-input-box:focus-within {
+  border-color: var(--accent-color);
 }
 
 .comment-text-input {
@@ -134,32 +232,41 @@
   outline: none;
   font-size: 14px;
   color: var(--text-primary);
+  font-family: inherit;
 }
 
 .comment-text-input::placeholder {
   color: var(--text-secondary);
 }
 
+.comment-text-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .submit-reply-btn {
-  background-color: #111; /* Solid black like Apple's dark buttons */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--accent-color);
   color: #fff;
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   font-weight: 600;
   font-size: 13px;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.15s;
   border: none;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.submit-reply-btn:hover {
-  opacity: 0.8;
+.submit-reply-btn:hover:not(:disabled) {
+  opacity: 0.85;
+  transform: scale(1.05);
 }
 
-/* In dark mode we might need the input box adjusting */
-@media (prefers-color-scheme: dark) {
-  .submit-reply-btn {
-    background-color: #e5e5e5;
-    color: #111;
-  }
+.submit-reply-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

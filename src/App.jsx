@@ -9,7 +9,7 @@ import Explore from './pages/Explore/Explore';
 import Notifications from './pages/Notifications/Notifications';
 import { useAppContext } from './context/AppContext';
 
-// Wrapper for protected routes
+// Route yang butuh login
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAppContext();
   if (!currentUser) {
@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Wrapper for auth routes (so logged in users can't see login again easily)
+// Route auth: kalau sudah login, redirect ke home
 const AuthRoute = ({ children }) => {
   const { currentUser } = useAppContext();
   if (currentUser) {
@@ -30,11 +30,12 @@ const AuthRoute = ({ children }) => {
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* Auth Routes */}
+      <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+      <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
       
-      {/* Main Routes Tanpa Proteksi */}
-      <Route path="/" element={<Layout />}>
+      {/* Protected Main Routes */}
+      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Home />} />
         <Route path="explore" element={<Explore />} />
         <Route path="notifications" element={<Notifications />} />

@@ -9,13 +9,15 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { register } = useAppContext();
+  const { register, loading, error } = useAppContext();
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    register(name, username, email, password);
-    navigate('/');
+    const success = await register(name, username, email, password);
+    if (success) {
+      navigate('/login');
+    }
   };
 
   return (
@@ -27,6 +29,8 @@ const Register = () => {
         </div>
         <p className="auth-subtitle">Bergabunglah dan bagikan ceritamu.</p>
         
+        {error && <div className="auth-error">{error}</div>}
+        
         <form className="auth-form" onSubmit={handleRegister}>
           <div className="input-group">
             <label htmlFor="name">Nama Lengkap</label>
@@ -37,6 +41,7 @@ const Register = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required 
+              disabled={loading}
             />
           </div>
           <div className="input-group">
@@ -48,6 +53,7 @@ const Register = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required 
+              disabled={loading}
             />
           </div>
           <div className="input-group">
@@ -59,6 +65,7 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
+              disabled={loading}
             />
           </div>
           <div className="input-group">
@@ -70,9 +77,12 @@ const Register = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
+              disabled={loading}
             />
           </div>
-          <button type="submit" className="btn-primary auth-button">Daftar</button>
+          <button type="submit" className="btn-primary auth-button" disabled={loading}>
+            {loading ? 'Daftar...' : 'Daftar'}
+          </button>
         </form>
 
         <div className="auth-footer">

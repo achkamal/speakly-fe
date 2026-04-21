@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react';
-import { Camera, X } from 'lucide-react';
+import { Camera, X, Send } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 import './CreatePost.css';
 
 const CreatePost = ({ onPost }) => {
+  const { currentUser, loading } = useAppContext();
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleTextChange = (e) => {
@@ -13,64 +15,65 @@ const CreatePost = ({ onPost }) => {
     e.target.style.height = e.target.scrollHeight + 'px';
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImage(url);
+  const handleSubmit = async () => {
+    if (!content.trim()) return;
+    
+    if (onPost) {
+      setSubmitting(true);
+      const success = await onPost({ content });
+      if (success) {
+        setContent('');
+        // Reset textarea height
+        const textarea = document.querySelector('.create-input');
+        if (textarea) textarea.style.height = 'auto';
+      }
+      setSubmitting(false);
     }
   };
 
-  const removeImage = () => {
-    setImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (!content.trim() && !image) return;
-      if (onPost) onPost({ content, image });
-      setContent('');
-      setImage(null);
+      handleSubmit();
     }
   };
+
+  const avatarSrc = currentUser?.avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=random`;
 
   return (
     <div className="create-post-container">
-      <h2 className="create-post-title">Create Post</h2>
       <div className="create-post-box">
-        <textarea
-          placeholder="What's on your mind?"
-          className="create-input"
-          value={content}
-          onChange={handleTextChange}
-          onKeyDown={handleSubmit}
-          rows={1}
-        />
-        
-        {image && (
-          <div className="image-preview">
-            <button className="remove-image-btn" onClick={removeImage}>
-              <X size={18} />
-            </button>
-            <img src={image} alt="Preview" />
-          </div>
+        {currentUser && (
+          <img src={avatarSrc} alt="avatar" className="create-avatar" />
         )}
-        
-        <div className="create-actions">
-          <label className="camera-btn" style={{ cursor: 'pointer' }}>
-            <Camera strokeWidth={1.5} size={20} />
-            <input 
-              type="file" 
-              accept="image/*" 
-              className="hidden-file-input" 
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-            />
-          </label>
+        <div className="create-input-wrapper">
+          <textarea
+            placeholder={currentUser ? "Apa yang sedang kamu pikirkan?" : "Login untuk membuat post"}
+            className="create-input"
+            value={content}
+            onChange={handleTextChange}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            disabled={!currentUser || submitting}
+          />
+          <div className="create-actions">
+            <span className="create-hint">Enter untuk kirim · Shift+Enter baris baru</span>
+            <button
+              className="create-post-btn"
+              onClick={handleSubmit}
+              disabled={!content.trim() || !currentUser || submitting}
+            >
+              {submitting ? (
+                <div className="create-spinner" />
+              ) : (
+                <>
+                  <Send size={15} />
+                  <span>Post</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

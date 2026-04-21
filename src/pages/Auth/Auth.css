@@ -87,3 +87,14 @@
 .auth-link:hover {
   color: var(--accent-hover);
 }
+
+.auth-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: left;
+  border-left: 4px solid #ef4444;
+}

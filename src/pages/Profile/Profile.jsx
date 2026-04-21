@@ -1,75 +1,125 @@
-import { useState } from 'react';
-import { LayoutGrid, List } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LayoutGrid, List, MessageCircle } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
+import PostCard from '../../components/Post/PostCard';
 import './Profile.css';
 
-const MOCK_USER = {
-  name: 'Alex Dev',
-  username: '@alex_dev',
-  bio: 'Uncanited working. find Speakly frontend with React!\n\nBio CSS structure. #webdev #react',
-  avatar: 'https://ui-avatars.com/api/?name=Alex&background=random',
-};
-
-// Based on the dark mode mock screenshot where PostCard area is full of grid images
-const MOCK_GRID_POSTS = [
-  { id: 1, image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&fit=crop', title: 'Just started working on the Speakly frontend w...' },
-  { id: 2, image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&fit=crop', title: 'Just started working on the Speakly frontend w...' },
-  { id: 3, image: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&fit=crop', title: 'Just started working on the Speakly frontend w...' },
-  { id: 4, image: 'https://images.unsplash.com/photo-1542261777448-23d2a287091c?q=80&w=400&fit=crop', title: 'Just started working on the Speakly frontend w...' },
-];
-
 const Profile = () => {
-  const [viewMode, setViewMode] = useState('grid');
+  const { currentUser, getUserPosts, loading } = useAppContext();
+  const [viewMode, setViewMode] = useState('list');
+  const [userPosts, setUserPosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+      if (!currentUser) {
+        setLoadingPosts(false);
+        return;
+      }
+      setLoadingPosts(true);
+      const data = await getUserPosts(currentUser.id);
+      setUserPosts(data);
+      setLoadingPosts(false);
+    };
+    fetchUserPosts();
+  }, [currentUser, getUserPosts]);
+
+  if (!currentUser) {
+    return (
+      <div className="profile-container">
+        <div className="profile-empty">
+          <p>Silakan login untuk melihat profil.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayUsername = currentUser.displayUsername || 
+    (currentUser.username ? `@${currentUser.username}` : '@user');
 
   return (
     <div className="profile-container">
-      {/* Profile Card Header (Rounded) */}
+      {/* Profile Card Header */}
       <div className="profile-hero-card">
-        <div className="profile-cover-placeholder"></div>
+        <div className="profile-cover-placeholder" />
         <div className="profile-hero-content">
           <div className="profile-hero-top">
-            <img src={MOCK_USER.avatar} alt={MOCK_USER.name} className="profile-large-avatar" />
+            <img
+              src={currentUser.avatar}
+              alt={currentUser.name}
+              className="profile-large-avatar"
+            />
             <div className="profile-names">
-              <h1 className="hero-name">{MOCK_USER.name}</h1>
-              <span className="hero-username">{MOCK_USER.username}</span>
+              <h1 className="hero-name">{currentUser.name}</h1>
+              <span className="hero-username">{displayUsername}</span>
             </div>
-            <button className="edit-profile-btn">Edit Profile</button>
           </div>
-          <div className="profile-bio-text">
-            {MOCK_USER.bio}
+          {currentUser.bio && (
+            <div className="profile-bio-text">{currentUser.bio}</div>
+          )}
+          <div className="profile-stats">
+            <div className="stat-item">
+              <span className="stat-count">{userPosts.length}</span>
+              <span className="stat-label">Posts</span>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Posts Section */}
       <div className="profile-content-section">
         <div className="profile-controls">
-          <h2 className="section-title">PostCard</h2>
+          <h2 className="section-title">Postingan</h2>
           <div className="view-toggles">
-            <button 
+            <button
               className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
+              title="Grid view"
             >
               <LayoutGrid size={20} />
             </button>
-            <button 
+            <button
               className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
+              title="List view"
             >
               <List size={22} />
             </button>
           </div>
         </div>
 
-        {viewMode === 'grid' && (
+        {loadingPosts ? (
+          <div className="profile-loading">
+            <div className="loading-spinner-sm" />
+            <p>Memuat postingan...</p>
+          </div>
+        ) : userPosts.length === 0 ? (
+          <div className="profile-no-posts">
+            <MessageCircle size={40} opacity={0.25} />
+            <p>Belum ada postingan.</p>
+          </div>
+        ) : viewMode === 'list' ? (
+          <div className="list-feed">
+            {userPosts.map(post => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
           <div className="grid-feed">
-            {MOCK_GRID_POSTS.map(post => (
+            {userPosts.filter(p => p.image).map(post => (
               <div key={post.id} className="grid-post-card">
                 <img src={post.image} alt="" className="grid-image" />
                 <div className="grid-info">
-                  <p className="grid-title">{post.title}</p>
-                  <div className="grid-actions">
-                    <span className="grid-action-item"><HeartIcon /> Like</span>
-                    <span className="grid-action-item"><CommentIcon /></span>
-                  </div>
+                  <p className="grid-title">{post.content?.slice(0, 60)}...</p>
+                </div>
+              </div>
+            ))}
+            {userPosts.filter(p => !p.image).map(post => (
+              <div key={post.id} className="grid-text-card">
+                <p className="grid-text-content">{post.content}</p>
+                <div className="grid-text-meta">
+                  <span>❤️ {post.likeCount || 0}</span>
+                  <span>💬 {post.commentCount || 0}</span>
                 </div>
               </div>
             ))}
@@ -79,13 +129,5 @@ const Profile = () => {
     </div>
   );
 };
-
-// Mini icons for the grid view
-const HeartIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-);
-const CommentIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
-);
 
 export default Profile;

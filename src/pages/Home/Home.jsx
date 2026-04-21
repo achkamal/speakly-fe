@@ -4,16 +4,22 @@ import PostCard from '../../components/Post/PostCard';
 import './Home.css';
 
 const Home = () => {
-  const { posts, addNewPost } = useAppContext();
+  const { posts, addNewPost, loading, error } = useAppContext();
 
   return (
     <div className="home-container">
+      {error && <div className="error-banner">{error}</div>}
+      {loading && posts.length === 0 && <div className="loading-overlay">Loading...</div>}
       <CreatePost onPost={addNewPost} />
       
       <div className="feed">
-        {posts.map(post => (
-          <PostCard key={post.id} post={post} />
-        ))}
+        {posts.length > 0 ? (
+          posts.map(post => (
+            <PostCard key={post.id || Math.random()} post={post} />
+          ))
+        ) : !loading && (
+          <div className="no-posts">No posts yet. Start the conversation!</div>
+        )}
       </div>
     </div>
   );

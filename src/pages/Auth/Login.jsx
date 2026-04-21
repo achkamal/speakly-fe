@@ -7,13 +7,16 @@ import './Auth.css';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAppContext();
+  const { login, loading, error } = useAppContext();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    login(email, password);
-    navigate('/');
+    const success = await login(email, password);
+    console.log(success)
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -24,31 +27,37 @@ const Login = () => {
           Speakly
         </div>
         <p className="auth-subtitle">Masuk untuk melihat apa yang sedang terjadi.</p>
-        
+
+        {error && <div className="auth-error">{error}</div>}
+
         <form className="auth-form" onSubmit={handleLogin}>
           <div className="input-group">
             <label htmlFor="email">Email</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="nama@email.com" 
+            <input
+              type="email"
+              id="email"
+              placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required 
+              required
+              disabled={loading}
             />
           </div>
           <div className="input-group">
             <label htmlFor="password">Kata Sandi</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="••••••••" 
+            <input
+              type="password"
+              id="password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required 
+              required
+              disabled={loading}
             />
           </div>
-          <button type="submit" className="btn-primary auth-button">Masuk</button>
+          <button type="submit" className="btn-primary auth-button" disabled={loading}>
+            {loading ? 'Masuk...' : 'Masuk'}
+          </button>
         </form>
 
         <div className="auth-footer">

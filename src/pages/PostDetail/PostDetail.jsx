@@ -1,102 +1,220 @@
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { MoreHorizontal } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { MoreHorizontal, Send, ArrowLeft, MessageCircle, Heart } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 import PostCard from '../../components/Post/PostCard';
 import './PostDetail.css';
 
-const MOCK_COMMENTS = [
-  {
-    id: 'c1',
-    author: { name: 'Designer Pro', username: '@designer_pro', avatar: 'https://ui-avatars.com/api/?name=Designer&background=random' },
-    content: 'Replly our inati and a meture to tntest it\'s speakly',
-    replies: [
-      {
-        id: 'r1',
-        author: { name: 'Dev Guru', username: '@dev_guru', avatar: 'https://ui-avatars.com/api/?name=Dev&background=random' },
-        content: '@dierey thoughts then it\'s Speaklty frontend',
-      },
-      {
-        id: 'r2',
-        author: { name: 'Alex Dev', username: '@alex_dev', avatar: 'https://ui-avatars.com/api/?name=Alex&background=random' },
-        content: 'Thoughts loving goosh list.',
-      }
-    ]
-  }
-];
-
 const PostDetail = () => {
-  const location = useLocation();
-  const post = location.state?.post || {
-    id: '1',
-    author: { name: 'Alex Dev', username: '@alex_dev', avatar: 'https://ui-avatars.com/api/?name=Alex&background=random' },
-    time: '2h ago',
-    content: 'Just started working on the Speakly frontend with React! Absolutely loving the clean CSS structure. #webdev #react',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&fit=crop',
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { getPostById, getComments, addComment, currentUser, socket, getLikeStatus } = useAppContext();
+
+  const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [replyText, setReplyText] = useState('');
+  const [loadingPost, setLoadingPost] = useState(true);
+  const [loadingComments, setLoadingComments] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const commentsEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Fetch post detail
+  useEffect(() => {
+    if (!id) return;
+    const load = async () => {
+      setLoadingPost(true);
+      const data = await getPostById(id);
+      setPost(data);
+      setLoadingPost(false);
+    };
+    load();
+  }, [id]);
+
+  // Fetch comments
+  useEffect(() => {
+    if (!id) return;
+    const load = async () => {
+      setLoadingComments(true);
+      const data = await getComments(id);
+      setComments(data);
+      setLoadingComments(false);
+    };
+    load();
+  }, [id]);
+
+  // Realtime: new comment arrives via socket
+  useEffect(() => {
+    if (!socket) return;
+    const handler = (newComment) => {
+      if (Number(newComment.postId) === Number(id)) {
+        // Format the raw comment from socket
+        const formatted = {
+          ...newComment,
+          author: {
+            id: newComment.user?.id,
+            name: newComment.user?.name,
+            username: newComment.user?.username ? `@${newComment.user.username}` : '@user',
+            avatar: newComment.user?.avatar ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(newComment.user?.name || 'User')}&background=random`,
+          },
+          time: new Date(newComment.createdAt).toLocaleString('id-ID', {
+            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+          }),
+        };
+        setComments(prev => {
+          // Avoid duplicate if this client's own comment already added optimistically
+          if (prev.some(c => c.id === formatted.id)) return prev;
+          return [...prev, formatted];
+        });
+      }
+    };
+    socket.on('newComment', handler);
+    return () => socket.off('newComment', handler);
+  }, [socket, id]);
+
+  // Scroll to bottom saat comments bertambah
+  useEffect(() => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [comments.length]);
+
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    if (!replyText.trim() || submitting) return;
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    setSubmitting(true);
+    const newComment = await addComment(id, replyText);
+    if (newComment) {
+      setComments(prev => {
+        if (prev.some(c => c.id === newComment.id)) return prev;
+        return [...prev, newComment];
+      });
+      setReplyText('');
+    }
+    setSubmitting(false);
   };
 
-  const [replyText, setReplyText] = useState('');
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmitComment(e);
+    }
+  };
+
+  if (loadingPost) {
+    return (
+      <div className="post-detail-container">
+        <div className="detail-loading">
+          <div className="loading-spinner" />
+          <p>Memuat post...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="post-detail-container">
+        <div className="detail-empty">
+          <MessageCircle size={48} opacity={0.3} />
+          <p>Post tidak ditemukan</p>
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> Kembali
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="post-detail-container">
-      {/* Main Post reused as a PostCard */}
-      <h2 className="detail-section-title">PostCard</h2>
+      {/* Back Button */}
+      <button className="detail-back-btn" onClick={() => navigate(-1)}>
+        <ArrowLeft size={18} />
+        <span>Kembali</span>
+      </button>
+
+      {/* Main Post */}
       <PostCard post={post} />
 
-      {/* Threaded Comments Container */}
+      {/* Comments Section */}
       <div className="thread-card">
+        <div className="thread-header">
+          <MessageCircle size={18} />
+          <span>{comments.length} Komentar</span>
+        </div>
+
+        {/* Comments List */}
         <div className="thread-list">
-          {MOCK_COMMENTS.map((comment) => (
-            <div key={comment.id} className="comment-block">
-              {/* Parent Comment */}
-              <div className="comment-item">
-                <img src={comment.author.avatar} alt="Avatar" className="comment-avatar" />
-                <div className="comment-content">
-                  <div className="comment-header">
-                    <span className="comment-username">{comment.author.username}</span>
-                    <span className="comment-action-text">replied SF Pro</span>
-                    <button className="post-options-btn"><MoreHorizontal size={16} /></button>
+          {loadingComments ? (
+            <div className="comments-loading">
+              <div className="loading-spinner" />
+              <p>Memuat komentar...</p>
+            </div>
+          ) : comments.length === 0 ? (
+            <div className="no-comments">
+              <MessageCircle size={36} opacity={0.25} />
+              <p>Belum ada komentar. Jadilah yang pertama!</p>
+            </div>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment.id} className="comment-block">
+                <div className="comment-item">
+                  <img
+                    src={comment.author?.avatar}
+                    alt={comment.author?.name}
+                    className="comment-avatar"
+                  />
+                  <div className="comment-content">
+                    <div className="comment-header">
+                      <span className="comment-name">{comment.author?.name}</span>
+                      <span className="comment-username">{comment.author?.username}</span>
+                      <span className="comment-time">{comment.time}</span>
+                    </div>
+                    <div className="comment-text">{comment.content}</div>
                   </div>
-                  <div className="comment-text">{comment.content}</div>
                 </div>
               </div>
-
-              {/* Replies (with connecting line) */}
-              {comment.replies && comment.replies.length > 0 && (
-                <div className="replies-container">
-                  <div className="thread-line"></div>
-                  {comment.replies.map(reply => (
-                    <div key={reply.id} className="reply-item">
-                      <div className="thread-horizontal-line"></div>
-                      <img src={reply.author.avatar} alt="Avatar" className="comment-avatar" />
-                      <div className="comment-content">
-                        <div className="comment-header">
-                          <span className="comment-username">{reply.author.username}</span>
-                          <span className="comment-action-text">replied SF Pro</span>
-                        </div>
-                        <div className="comment-text">{reply.content}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+            ))
+          )}
+          <div ref={commentsEndRef} />
         </div>
 
-        {/* Comment Input Footer */}
-        <div className="comment-input-area">
-          <img src="https://ui-avatars.com/api/?name=You&background=random" alt="Your avatar" className="comment-avatar" />
+        {/* Comment Input */}
+        <form className="comment-input-area" onSubmit={handleSubmitComment}>
+          <img
+            src={currentUser?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'You')}&background=random`}
+            alt="Your avatar"
+            className="comment-avatar"
+          />
           <div className="comment-input-box">
-            <input 
-              type="text" 
-              placeholder="Add a comment..." 
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder={currentUser ? 'Tulis komentar...' : 'Login untuk berkomentar'}
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="comment-text-input"
+              disabled={!currentUser || submitting}
             />
-            <button className="submit-reply-btn">Post Reply</button>
+            <button
+              type="submit"
+              className="submit-reply-btn"
+              disabled={!replyText.trim() || !currentUser || submitting}
+            >
+              {submitting ? (
+                <div className="btn-spinner" />
+              ) : (
+                <Send size={16} />
+              )}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

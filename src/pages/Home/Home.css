@@ -1,3 +1,36 @@
 .feed {
   padding-bottom: 20px;
 }
+
+.home-container.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.error-banner {
+  background-color: rgba(255, 77, 77, 0.1);
+  color: #ff4d4d;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  margin: 0 20px 16px;
+  border: 1px solid rgba(255, 77, 77, 0.2);
+  font-size: 14px;
+}
+
+.no-posts {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.loading-overlay {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
