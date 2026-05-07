@@ -7,6 +7,7 @@ import Profile from './pages/Profile/Profile';
 import PostDetail from './pages/PostDetail/PostDetail';
 import Explore from './pages/Explore/Explore';
 import Notifications from './pages/Notifications/Notifications';
+import UserProfile from './pages/UserProfile/UserProfile';
 import { useAppContext } from './context/AppContext';
 
 // Route yang butuh login
@@ -41,6 +42,7 @@ function App() {
         <Route path="notifications" element={<Notifications />} />
         <Route path="profile" element={<Profile />} />
         <Route path="post/:id" element={<PostDetail />} />
+        <Route path="user/:id" element={<UserProfile />} />
       </Route>
 
       {/* Fallback */}

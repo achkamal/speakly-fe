@@ -3,25 +3,26 @@ import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
 import { Home, Search, Bell, User, X, LogOut } from 'lucide-react';
 import SidebarRight from '../SidebarRight/SidebarRight';
 import CreatePost from '../CreatePost/CreatePost';
+import NotificationDropdown from '../NotificationDropdown/NotificationDropdown';
 import { useAppContext } from '../../context/AppContext';
 import './Layout.css';
 
 const Layout = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { addNewPost, logout } = useAppContext();
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const { addNewPost, logout, unreadCount } = useAppContext();
   const navigate = useNavigate();
 
   const navItems = [
     { to: '/', icon: Home, label: 'Home' },
     { to: '/explore', icon: Search, label: 'Explore' },
-    { to: '/notifications', icon: Bell, label: 'Notifications' },
     { to: '/profile', icon: User, label: 'Profile' },
   ];
 
   const handlePostSubmit = (data) => {
     addNewPost(data);
     setIsModalOpen(false);
-    navigate('/'); 
+    navigate('/');
   };
 
   const handleLogout = () => {
@@ -41,18 +42,46 @@ const Layout = () => {
             <NavLink 
               key={item.to} 
               to={item.to} 
+              end={item.to === '/'}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <item.icon strokeWidth={2} size={22} className="nav-icon" />
               <span className="nav-text">{item.label}</span>
             </NavLink>
           ))}
+
+          {/* Bell dengan dropdown notifikasi */}
+          <div className="nav-notif-wrapper">
+            <button
+              id="notif-bell-btn"
+              className={`nav-item nav-notif-btn ${isNotifOpen ? 'active' : ''}`}
+              onClick={() => setIsNotifOpen(prev => !prev)}
+            >
+              <div className="notif-bell-wrap">
+                <Bell strokeWidth={2} size={22} className="nav-icon" />
+                {unreadCount > 0 && (
+                  <span className="notif-badge">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </div>
+              <span className="nav-text">Notifikasi</span>
+            </button>
+
+            {isNotifOpen && (
+              <NotificationDropdown onClose={() => setIsNotifOpen(false)} />
+            )}
+          </div>
           
           <button className="sidebar-post-btn" onClick={() => setIsModalOpen(true)}>
             Post
           </button>
           
-          <button className="nav-item" style={{ marginTop: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'flex-start' }} onClick={handleLogout}>
+          <button
+            className="nav-item"
+            style={{ marginTop: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'flex-start' }}
+            onClick={handleLogout}
+          >
             <LogOut strokeWidth={2} size={22} className="nav-icon" />
             <span className="nav-text">Logout</span>
           </button>
@@ -74,12 +103,36 @@ const Layout = () => {
         {navItems.map((item) => (
           <NavLink 
             key={item.to} 
-            to={item.to} 
+            to={item.to}
+            end={item.to === '/'}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <item.icon strokeWidth={2} size={24} />
           </NavLink>
         ))}
+
+        {/* Bell mobile */}
+        <div className="nav-notif-wrapper">
+          <button
+            id="notif-bell-mobile-btn"
+            className={`nav-item ${isNotifOpen ? 'active' : ''}`}
+            style={{ background: 'transparent', border: 'none', padding: '12px', position: 'relative' }}
+            onClick={() => setIsNotifOpen(prev => !prev)}
+          >
+            <div className="notif-bell-wrap">
+              <Bell strokeWidth={2} size={24} />
+              {unreadCount > 0 && (
+                <span className="notif-badge">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
+          </button>
+          {isNotifOpen && (
+            <NotificationDropdown onClose={() => setIsNotifOpen(false)} />
+          )}
+        </div>
+
         <button className="nav-item" onClick={handleLogout} style={{ background: 'transparent', border: 'none', padding: '12px' }}>
           <LogOut strokeWidth={2} size={24} />
         </button>
@@ -94,7 +147,6 @@ const Layout = () => {
                 <X size={24} />
               </button>
             </div>
-            {/* Reuse CreatePost inside the modal */}
             <CreatePost onPost={handlePostSubmit} />
           </div>
         </div>

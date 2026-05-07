@@ -5,10 +5,12 @@ import PostCard from '../../components/Post/PostCard';
 import './Profile.css';
 
 const Profile = () => {
-  const { currentUser, getUserPosts, loading } = useAppContext();
+  const { currentUser, getUserPosts, getFollowStatus, loading } = useAppContext();
   const [viewMode, setViewMode] = useState('list');
   const [userPosts, setUserPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -23,6 +25,18 @@ const Profile = () => {
     };
     fetchUserPosts();
   }, [currentUser, getUserPosts]);
+
+  useEffect(() => {
+    const fetchFollowStats = async () => {
+      if (!currentUser) return;
+      const status = await getFollowStatus(currentUser.id);
+      if (status) {
+        setFollowerCount(status.followerCount ?? 0);
+        setFollowingCount(status.followingCount ?? 0);
+      }
+    };
+    fetchFollowStats();
+  }, [currentUser, getFollowStatus]);
 
   if (!currentUser) {
     return (
@@ -61,6 +75,14 @@ const Profile = () => {
             <div className="stat-item">
               <span className="stat-count">{userPosts.length}</span>
               <span className="stat-label">Posts</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-count">{followerCount.toLocaleString('id-ID')}</span>
+              <span className="stat-label">Pengikut</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-count">{followingCount.toLocaleString('id-ID')}</span>
+              <span className="stat-label">Mengikuti</span>
             </div>
           </div>
         </div>

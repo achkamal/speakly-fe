@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 
 const AppContext = createContext();
@@ -21,10 +21,12 @@ const authHeaders = (extra = {}) => {
 export const AppContextProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
 
   // Helper to map backend format ke format yg dipakai frontend
   const formatPost = (p) => ({
@@ -76,15 +78,93 @@ export const AppContextProvider = ({ children }) => {
     }
   }, []);
 
+  // ─── Fetch Notifications ────────────────────────────────────────────────────
+  const fetchNotifications = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/notification`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await response.json();
+      if (response.ok && body.success) {
+        setNotifications(body.data || []);
+        setUnreadCount((body.data || []).filter(n => !n.isRead).length);
+      }
+    } catch (err) {
+      console.warn('Fetch notifications error:', err);
+    }
+  }, []);
+
+  const markNotificationRead = async (notifId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await fetch(`${API_BASE_URL}/notification/${notifId}/read`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications(prev =>
+        prev.map(n => n.id === notifId ? { ...n, isRead: true } : n)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Mark notification read error:', err);
+    }
+  };
+
+  const markAllNotificationsRead = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await fetch(`${API_BASE_URL}/notification/read-all`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Mark all notifications read error:', err);
+    }
+  };
+
+  const deleteNotification = async (notifId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await fetch(`${API_BASE_URL}/notification/${notifId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications(prev => {
+        const removed = prev.find(n => n.id === notifId);
+        if (removed && !removed.isRead) setUnreadCount(c => Math.max(0, c - 1));
+        return prev.filter(n => n.id !== notifId);
+      });
+    } catch (err) {
+      console.error('Delete notification error:', err);
+    }
+  };
+
   // ─── Mount: restore session + connect socket ────────────────────────────────
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
+    let user = null;
     if (savedUser) {
-      try { setCurrentUser(JSON.parse(savedUser)); } catch { /* abaikan */ }
+      try { user = JSON.parse(savedUser); setCurrentUser(user); } catch { /* abaikan */ }
     }
 
     const newSocket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+    socketRef.current = newSocket;
     setSocket(newSocket);
+
+    // Join room pribadi jika sudah login
+    if (user?.id) {
+      newSocket.on('connect', () => {
+        newSocket.emit('joinRoom', user.id);
+      });
+      newSocket.emit('joinRoom', user.id);
+    }
 
     // Realtime: new post ditambahkan → prepend ke feed semua client
     newSocket.on('newPost', (rawPost) => {
@@ -104,7 +184,6 @@ export const AppContextProvider = ({ children }) => {
         likeCount: rawPost._count?.likes ?? 0,
         commentCount: rawPost._count?.comments ?? 0,
       };
-      // Prepend: post terbaru di atas, skip duplikat
       setPosts(prev => {
         if (prev.some(p => p.id === formatted.id)) return prev;
         return [formatted, ...prev];
@@ -131,10 +210,20 @@ export const AppContextProvider = ({ children }) => {
       );
     });
 
+    // 🔔 Realtime: notifikasi baru masuk ke room privat user
+    newSocket.on('newNotification', (notif) => {
+      setNotifications(prev => {
+        if (prev.some(n => n.id === notif.id)) return prev;
+        return [notif, ...prev];
+      });
+      setUnreadCount(prev => prev + 1);
+    });
+
     fetchPosts();
+    if (user?.id) fetchNotifications();
 
     return () => newSocket.disconnect();
-  }, [fetchPosts]);
+  }, [fetchPosts, fetchNotifications]);
 
   // ─── Get Post By ID ─────────────────────────────────────────────────────────
   const getPostById = async (id) => {
@@ -185,6 +274,15 @@ export const AppContextProvider = ({ children }) => {
       setCurrentUser(user);
       localStorage.setItem('user', JSON.stringify(user));
       if (body.data.token) localStorage.setItem('token', body.data.token);
+
+      // Join room privat setelah login
+      if (socketRef.current) {
+        socketRef.current.emit('joinRoom', user.id);
+      }
+
+      // Fetch notifikasi setelah login
+      setTimeout(() => fetchNotifications(), 300);
+
       return true;
     } catch (err) {
       setError(err.message);
@@ -231,6 +329,8 @@ export const AppContextProvider = ({ children }) => {
     }
     setCurrentUser(null);
     setPosts([]);
+    setNotifications([]);
+    setUnreadCount(0);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
@@ -250,7 +350,6 @@ export const AppContextProvider = ({ children }) => {
 
       const body = await response.json();
       if (response.ok && body.success) {
-        // Tidak perlu fetchPosts() — socket 'newPost' akan update semua client
         return true;
       } else {
         throw new Error(body.message || 'Gagal membuat post');
@@ -420,10 +519,77 @@ export const AppContextProvider = ({ children }) => {
     return [];
   }, []);
 
+  // ─── Follow ──────────────────────────────────────────────────────────────────
+  const toggleFollow = async (targetUserId) => {
+    const token = localStorage.getItem('token');
+    if (!token) { setError('Kamu harus login untuk follow'); return null; }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/follow/${targetUserId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await response.json();
+      if (response.ok && body.success) return body.data;
+    } catch (err) {
+      console.error('Toggle follow error:', err);
+    }
+    return null;
+  };
+
+  const getFollowStatus = async (targetUserId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return { isFollowing: false, followerCount: 0, followingCount: 0 };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/follow/${targetUserId}/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await response.json();
+      if (response.ok && body.success) return body.data;
+    } catch (err) {
+      console.error('Get follow status error:', err);
+    }
+    return { isFollowing: false, followerCount: 0, followingCount: 0 };
+  };
+
+  // ─── User Search & Profile ───────────────────────────────────────────────────
+  const searchUsers = async (query) => {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/auth/search?q=${encodeURIComponent(query)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const body = await response.json();
+      if (response.ok && body.success) return body.data || [];
+    } catch (err) {
+      console.error('Search users error:', err);
+    }
+    return [];
+  };
+
+  const getUserProfileById = async (userId) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/auth/user/${userId}`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      const body = await response.json();
+      if (response.ok && body.success) return body.data;
+    } catch (err) {
+      console.error('Get user profile error:', err);
+    }
+    return null;
+  };
+
   return (
     <AppContext.Provider value={{
       posts,
       notifications,
+      unreadCount,
       currentUser,
       loading,
       error,
@@ -441,6 +607,14 @@ export const AppContextProvider = ({ children }) => {
       getComments,
       addComment,
       getUserPosts,
+      fetchNotifications,
+      markNotificationRead,
+      markAllNotificationsRead,
+      deleteNotification,
+      toggleFollow,
+      getFollowStatus,
+      searchUsers,
+      getUserProfileById,
     }}>
       {children}
     </AppContext.Provider>

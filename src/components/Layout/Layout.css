@@ -239,3 +239,47 @@
   background-color: var(--bg-secondary);
 }
 
+/* ── Notification Bell & Badge ──────────────────────────────────────── */
+.nav-notif-wrapper {
+  position: relative;
+}
+
+.nav-notif-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.notif-bell-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--bg-card, #fff);
+  animation: badge-pop 0.25s cubic-bezier(.36,.07,.19,.97);
+}
+
+@keyframes badge-pop {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
