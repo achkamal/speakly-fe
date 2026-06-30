@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
-import { Home, Search, Bell, User, X, LogOut } from 'lucide-react';
+import { Home, Search, Bell, User, X, LogOut, Sun, Moon } from 'lucide-react';
 import SidebarRight from '../SidebarRight/SidebarRight';
 import CreatePost from '../CreatePost/CreatePost';
 import NotificationDropdown from '../NotificationDropdown/NotificationDropdown';
@@ -10,7 +10,7 @@ import './Layout.css';
 const Layout = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const { addNewPost, logout, unreadCount } = useAppContext();
+  const { addNewPost, logout, unreadCount, theme, toggleTheme } = useAppContext();
   const navigate = useNavigate();
 
   const navItems = [
@@ -76,10 +76,29 @@ const Layout = () => {
           <button className="sidebar-post-btn" onClick={() => setIsModalOpen(true)}>
             Post
           </button>
+
+          {/* Theme Toggle Button */}
+          <button
+            className="nav-item theme-toggle-btn"
+            style={{ marginTop: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'flex-start' }}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun strokeWidth={2} size={22} className="nav-icon" />
+                <span className="nav-text">Mode Terang</span>
+              </>
+            ) : (
+              <>
+                <Moon strokeWidth={2} size={22} className="nav-icon" />
+                <span className="nav-text">Mode Gelap</span>
+              </>
+            )}
+          </button>
           
           <button
             className="nav-item"
-            style={{ marginTop: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'flex-start' }}
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'flex-start' }}
             onClick={handleLogout}
           >
             <LogOut strokeWidth={2} size={22} className="nav-icon" />
@@ -132,6 +151,11 @@ const Layout = () => {
             <NotificationDropdown onClose={() => setIsNotifOpen(false)} />
           )}
         </div>
+
+        {/* Mobile Theme Toggle Button */}
+        <button className="nav-item" onClick={toggleTheme} style={{ background: 'transparent', border: 'none', padding: '12px' }}>
+          {theme === 'dark' ? <Sun strokeWidth={2} size={24} /> : <Moon strokeWidth={2} size={24} />}
+        </button>
 
         <button className="nav-item" onClick={handleLogout} style={{ background: 'transparent', border: 'none', padding: '12px' }}>
           <LogOut strokeWidth={2} size={24} />

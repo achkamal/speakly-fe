@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  animation: pageEnter 0.4s ease-out;
 }
 
 /* Back button */
@@ -17,11 +18,11 @@
   font-weight: 500;
   cursor: pointer;
   padding: 16px 20px 8px;
-  transition: color 0.2s;
+  transition: color var(--transition-fast);
 }
 
 .detail-back-btn:hover {
-  color: var(--text-primary);
+  color: var(--accent-color);
 }
 
 /* Loading / empty states */
@@ -70,11 +71,13 @@
   color: var(--text-primary);
   cursor: pointer;
   font-size: 13px;
-  transition: background 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .back-btn:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-light);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
 /* Thread card */
@@ -98,6 +101,10 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.thread-header svg {
+  color: var(--accent-color);
 }
 
 .thread-list {
@@ -136,7 +143,7 @@
 
 /* Individual comment */
 .comment-block {
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border-color);
   animation: fadeSlideIn 0.25s ease;
 }
@@ -161,6 +168,7 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  border: 2px solid var(--border-color);
 }
 
 .comment-content {
@@ -185,7 +193,7 @@
 
 .comment-username {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--accent-color);
 }
 
 .comment-time {
@@ -217,12 +225,14 @@
   background-color: var(--bg-secondary);
   border-radius: var(--radius-full);
   padding: 4px 4px 4px 16px;
-  border: 1px solid var(--border-color);
-  transition: border-color 0.2s;
+  border: 1.5px solid transparent;
+  transition: all var(--transition-normal);
 }
 
 .comment-input-box:focus-within {
   border-color: var(--accent-color);
+  background-color: var(--bg-card);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .comment-text-input {
@@ -248,25 +258,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--accent-color);
-  color: #fff;
-  width: 34px;
-  height: 34px;
+  background: var(--accent-gradient);
+  color: var(--accent-text);
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   font-weight: 600;
   font-size: 13px;
-  transition: opacity 0.2s, transform 0.15s;
+  transition: all var(--transition-normal);
   border: none;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .submit-reply-btn:hover:not(:disabled) {
-  opacity: 0.85;
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-glow);
 }
 
 .submit-reply-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }

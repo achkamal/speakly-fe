@@ -26,17 +26,20 @@
   justify-content: center;
   padding: 12px;
   border-radius: var(--radius-full);
-  color: var(--text-primary);
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all var(--transition-normal);
   text-decoration: none;
+  position: relative;
 }
 
 .nav-item.active {
   font-weight: 600;
+  color: var(--accent-color);
 }
 
 .nav-item:hover {
-  background-color: var(--bg-secondary);
+  background-color: var(--accent-light);
+  color: var(--accent-color);
 }
 
 .nav-text {
@@ -64,7 +67,7 @@
   border-left: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
   min-height: 100vh;
-  padding-bottom: 80px; /* For mobile nav */
+  padding-bottom: 80px;
   background-color: var(--bg-primary);
 }
 
@@ -87,6 +90,7 @@
     top: 0;
     padding: 20px 0;
     align-items: center;
+    z-index: 50;
   }
 
   .nav-item {
@@ -119,10 +123,21 @@
     padding: 12px 16px;
     gap: 16px;
     border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+  }
+
+  .nav-item.active {
+    background-color: var(--accent-light);
+    color: var(--accent-color);
+  }
+
+  .nav-item.active .nav-icon {
+    color: var(--accent-color);
   }
 
   .nav-icon {
     flex-shrink: 0;
+    transition: color var(--transition-fast);
   }
 
   .nav-text {
@@ -137,12 +152,15 @@
     align-items: center;
     font-size: 24px;
     font-weight: 800;
-    color: var(--text-primary);
     text-decoration: none;
   }
   
   .logo-text {
     display: block;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   
   .nav-links-wrapper {
@@ -155,20 +173,38 @@
   .sidebar-post-btn {
     display: block;
     border-radius: var(--radius-lg);
-    background-color: var(--bg-card); /* Following screenshot design where sidebar buttons are light/dark styling */
-    color: var(--text-primary);
+    background: var(--accent-gradient);
+    color: var(--accent-text);
     padding: 14px;
     font-size: 15px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-card);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
   }
-  
-  /* In dark mode we might need the exact look or default to btn-primary */
-  @media (prefers-color-scheme: dark) {
-    .sidebar-post-btn {
-      background-color: #333;
-      border: none;
-    }
+
+  .sidebar-post-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+  }
+
+  .sidebar-post-btn:hover::before {
+    opacity: 1;
+  }
+
+  .sidebar-post-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .sidebar-post-btn:active {
+    transform: translateY(0);
   }
 }
 
@@ -195,23 +231,42 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-top: 10vh;
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-content-wrapper {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-card);
   width: 100%;
   max-width: 600px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
+  animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid var(--border-color);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-header {
@@ -229,14 +284,15 @@
   height: 36px;
   border-radius: 50%;
   color: var(--text-primary);
-  transition: background-color 0.2s;
+  transition: all var(--transition-fast);
   cursor: pointer;
   border: none;
   background: transparent;
 }
 
 .close-modal-btn:hover {
-  background-color: var(--bg-secondary);
+  background-color: var(--accent-light);
+  color: var(--accent-color);
 }
 
 /* ── Notification Bell & Badge ──────────────────────────────────────── */
@@ -266,7 +322,7 @@
   height: 18px;
   padding: 0 4px;
   border-radius: 999px;
-  background: #ef4444;
+  background: var(--danger-color);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -275,11 +331,11 @@
   justify-content: center;
   line-height: 1;
   border: 2px solid var(--bg-card, #fff);
-  animation: badge-pop 0.25s cubic-bezier(.36,.07,.19,.97);
+  animation: badge-pop 0.3s cubic-bezier(.36,.07,.19,.97);
 }
 
 @keyframes badge-pop {
   0%   { transform: scale(0); }
-  70%  { transform: scale(1.2); }
+  60%  { transform: scale(1.2); }
   100% { transform: scale(1); }
 }

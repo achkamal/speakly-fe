@@ -4,6 +4,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  animation: pageEnter 0.4s ease-out;
 }
 
 /* Back button */
@@ -27,11 +28,12 @@
   border-bottom: 1px solid var(--border-color);
   width: 100%;
   text-align: left;
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
 }
 
 .up-back-btn:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-light);
+  color: var(--accent-color);
 }
 
 /* Loading */
@@ -49,7 +51,7 @@
   width: 28px;
   height: 28px;
   border: 3px solid var(--border-color);
-  border-top-color: #6366f1;
+  border-top-color: var(--accent-color);
   border-radius: 50%;
   animation: up-spin 0.7s linear infinite;
 }
@@ -74,8 +76,15 @@
 }
 
 .up-cover {
-  height: 130px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  height: 140px;
+  background: var(--accent-gradient);
+  background-size: 200% 200%;
+  animation: coverShift 6s ease-in-out infinite;
+}
+
+@keyframes coverShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .up-hero-content {
@@ -97,7 +106,12 @@
   object-fit: cover;
   border: 4px solid var(--bg-card);
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 0 0 3px var(--accent-color);
+  transition: box-shadow var(--transition-normal);
+}
+
+.up-avatar:hover {
+  box-shadow: 0 0 0 3px var(--accent-color), var(--shadow-glow);
 }
 
 .up-names {
@@ -115,7 +129,8 @@
 
 .up-username {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--accent-color);
+  font-weight: 500;
 }
 
 /* Follow Button */
@@ -128,17 +143,17 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: all var(--transition-normal);
   flex-shrink: 0;
   align-self: flex-end;
-  background: #6366f1;
-  color: #fff;
-  border: 1.5px solid #6366f1;
+  background: var(--accent-gradient);
+  color: var(--accent-text);
+  border: 1.5px solid var(--accent-color);
 }
 
 .up-follow-btn:hover:not(:disabled) {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
 }
 
 .up-follow-btn--following {
@@ -197,13 +212,16 @@
 }
 
 .up-stat--clickable:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-light);
 }
 
 .up-stat-count {
   font-size: 20px;
   font-weight: 800;
-  color: var(--text-primary);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1;
 }
 
@@ -242,12 +260,16 @@
   padding: 7px;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
-  transition: all 0.15s;
+  transition: all var(--transition-fast);
 }
 
-.up-view-btn.active,
-.up-view-btn:hover {
-  background: var(--bg-secondary);
+.up-view-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.up-view-btn:hover:not(.active) {
   color: var(--text-primary);
 }
 
@@ -275,7 +297,7 @@
   border-radius: var(--radius-sm);
   padding: 12px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all var(--transition-fast);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -283,7 +305,8 @@
 }
 
 .up-grid-card:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-light);
+  border-color: rgba(99, 102, 241, 0.15);
 }
 
 .up-grid-text {

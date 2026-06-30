@@ -1,23 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-:root {
+:root,
+:root.light-theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   
-  /* Light Theme Variables */
-  --bg-primary: #f5f5f7;  /* Slightly gray background for the app */
-  --bg-card: #ffffff;    /* Card background is pure white */
-  --bg-secondary: #eaeaec;
-  --bg-tertiary: #d9d9de;
-  --text-primary: #111111;
-  --text-secondary: #6e6e73;
-  --border-color: rgba(0, 0, 0, 0.08); /* Very subtle borders */
-  --accent-color: #000000; /* Apple often uses black as primary action */
-  --accent-hover: #333333;
-  --danger-color: #ff3b30;
-  --success-color: #34c759;
+  /* Light Theme Variables (Frosted Glassmorphism look) */
+  --bg-primary: #eceef5;  /* Slightly darker grayish-blue to make translucent white cards pop */
+  --bg-card: rgba(255, 255, 255, 0.45);  /* Semi-transparent white card */
+  --bg-secondary: rgba(240, 241, 245, 0.5);
+  --bg-tertiary: rgba(220, 222, 230, 0.6);
+  --text-primary: #1a1a2e;
+  --text-secondary: #5c6285;
+  --border-color: rgba(99, 102, 241, 0.08);
+  --accent-color: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-light: rgba(99, 102, 241, 0.05);
+  --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --accent-text: #ffffff;
+  --danger-color: #ef4444;
+  --success-color: #22c55e;
   
-  --glass-bg: rgba(245, 245, 247, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(99, 102, 241, 0.08);
   
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -25,27 +29,61 @@
   --radius-xl: 20px;
   --radius-full: 9999px;
   
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 8px 32px 0 rgba(31, 38, 135, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01);
+  --shadow-lg: 0 10px 40px 0 rgba(99, 102, 241, 0.08);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.18);
+  
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark Theme Variables */
-    --bg-primary: #121212;   /* Main background */
-    --bg-card: #1c1c1e;     /* Card background */
-    --bg-secondary: #2c2c2e;
-    --bg-tertiary: #3a3a3c;
-    --text-primary: #f5f5f7;
-    --text-secondary: #86868b;
-    --border-color: rgba(255, 255, 255, 0.1);
-    --accent-color: #ffffff;
-    --accent-hover: #e5e5e5;
+  :root:not(.light-theme) {
+    /* Dark Theme Variables (Frosted Dark Glassmorphism look) */
+    --bg-primary: #0a0a12;
+    --bg-card: rgba(22, 22, 38, 0.55);  /* Semi-transparent dark purple-blue card */
+    --bg-secondary: rgba(35, 35, 60, 0.45);
+    --bg-tertiary: rgba(48, 48, 80, 0.5);
+    --text-primary: #f0f0ff;
+    --text-secondary: #8888aa;
+    --border-color: rgba(139, 92, 246, 0.12);
+    --accent-color: #818cf8;
+    --accent-hover: #6366f1;
+    --accent-light: rgba(129, 140, 248, 0.06);
+    --accent-gradient: linear-gradient(135deg, #818cf8, #a78bfa);
+    --accent-text: #ffffff;
     
-    --glass-bg: rgba(18, 18, 18, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(15, 15, 26, 0.65);
+    --glass-border: rgba(139, 92, 246, 0.1);
     
-    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.2);
+    --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 12px 48px 0 rgba(0, 0, 0, 0.45);
+    --shadow-glow: 0 0 24px rgba(129, 140, 248, 0.22);
   }
+}
+
+:root.dark-theme {
+  /* Manual Dark Theme Variables */
+  --bg-primary: #0a0a12;
+  --bg-card: rgba(22, 22, 38, 0.55);
+  --bg-secondary: rgba(35, 35, 60, 0.45);
+  --bg-tertiary: rgba(48, 48, 80, 0.5);
+  --text-primary: #f0f0ff;
+  --text-secondary: #8888aa;
+  --border-color: rgba(139, 92, 246, 0.12);
+  --accent-color: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-light: rgba(129, 140, 248, 0.06);
+  --accent-gradient: linear-gradient(135deg, #818cf8, #a78bfa);
+  --accent-text: #ffffff;
+  
+  --glass-bg: rgba(15, 15, 26, 0.65);
+  --glass-border: rgba(139, 92, 246, 0.1);
+  
+  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 12px 48px 0 rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 24px rgba(129, 140, 248, 0.22);
 }
 
 * {
@@ -73,7 +111,6 @@ button {
   border: none;
   background: none;
   cursor: pointer;
-  color: inherit;
 }
 
 input, textarea {
@@ -90,17 +127,37 @@ input, textarea {
 }
 
 .btn-primary {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
+  background: var(--accent-gradient);
+  color: var(--accent-text);
   padding: 10px 20px;
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 15px;
-  transition: opacity 0.2s;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
 }
 
 .btn-primary:hover {
-  opacity: 0.8;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -110,7 +167,7 @@ input, textarea {
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 15px;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-normal);
 }
 
 .btn-secondary:hover {
@@ -124,7 +181,7 @@ input, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-fast);
 }
 
 .btn-icon:hover {
@@ -155,10 +212,31 @@ input, textarea {
   border-right: 1px solid var(--border-color);
   min-height: 100vh;
   padding-bottom: 80px; /* For mobile nav */
+  animation: pageEnter 0.4s ease-out;
 }
 
 @media (min-width: 640px) {
   .main-content {
     padding-bottom: 0;
   }
+}
+
+/* Page entrance animation */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

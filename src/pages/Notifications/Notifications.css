@@ -2,6 +2,7 @@
 
 .notifications-container {
   min-height: 100vh;
+  animation: pageEnter 0.4s ease-out;
 }
 
 /* Header */
@@ -13,7 +14,9 @@
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
-  background: var(--bg-primary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 10;
 }
 
@@ -31,7 +34,7 @@
 }
 
 .notif-header-badge {
-  background: #6366f1;
+  background: var(--accent-gradient);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -46,8 +49,8 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.08);
+  color: var(--accent-color);
+  background: var(--accent-light);
   border: none;
   border-radius: 20px;
   padding: 7px 14px;
@@ -57,7 +60,7 @@
 }
 
 .notif-read-all-btn:hover {
-  background: rgba(99, 102, 241, 0.16);
+  background: rgba(99, 102, 241, 0.15);
 }
 
 /* List */
@@ -103,7 +106,7 @@
   gap: 14px;
   padding: 16px 20px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
   border-bottom: 1px solid var(--border-color);
   position: relative;
 }
@@ -113,7 +116,7 @@
 }
 
 .notification-card:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-light);
 }
 
 .notification-card--unread {
@@ -217,7 +220,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #6366f1;
+  background: var(--accent-color);
   flex-shrink: 0;
 }
 

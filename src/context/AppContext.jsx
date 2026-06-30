@@ -28,6 +28,29 @@ export const AppContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const socketRef = useRef(null);
 
+  // ─── Theme Mode State & Effect ──────────────────────────────────────────────
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark-theme');
+      root.classList.remove('light-theme');
+    } else {
+      root.classList.add('light-theme');
+      root.classList.remove('dark-theme');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   // Helper to map backend format ke format yg dipakai frontend
   const formatPost = (p) => ({
     ...p,
@@ -615,6 +638,8 @@ export const AppContextProvider = ({ children }) => {
       getFollowStatus,
       searchUsers,
       getUserProfileById,
+      theme,
+      toggleTheme,
     }}>
       {children}
     </AppContext.Provider>

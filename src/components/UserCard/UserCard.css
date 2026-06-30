@@ -6,7 +6,7 @@
   gap: 14px;
   padding: 14px 20px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -15,7 +15,7 @@
 }
 
 .user-card:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-light);
 }
 
 /* Avatar */
@@ -29,11 +29,12 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--border-color);
-  transition: border-color 0.2s;
+  transition: all var(--transition-normal);
 }
 
 .user-card:hover .uc-avatar {
-  border-color: #6366f1;
+  border-color: var(--accent-color);
+  transform: scale(1.03);
 }
 
 /* Info */
@@ -52,6 +53,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color var(--transition-fast);
+}
+
+.user-card:hover .uc-name {
+  color: var(--accent-color);
 }
 
 .uc-username {
@@ -86,23 +92,22 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 13px;
   font-weight: 700;
-  border: 1.5px solid currentColor;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: all var(--transition-normal);
   flex-shrink: 0;
   min-width: 90px;
   justify-content: center;
-  background: #6366f1;
-  color: #fff;
-  border-color: #6366f1;
+  background: var(--accent-gradient);
+  color: var(--accent-text);
+  border: 1.5px solid transparent;
 }
 
 .uc-follow-btn:hover:not(:disabled) {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
 }
 
 .uc-follow-btn--following {
@@ -113,8 +118,8 @@
 
 .uc-follow-btn--following:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
-  border-color: #ef4444;
+  color: var(--danger-color);
+  border-color: var(--danger-color);
 }
 
 .uc-follow-btn:disabled {
